@@ -1,0 +1,98 @@
+module traffic_light(
+    input  wire clk,
+    input  wire reset,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    parameter RED_TIME    = 10;
+    parameter YELLOW_TIME = 4;
+    parameter GREEN_TIME  = 10;
+
+    reg [3:0] counter;   
+    reg [1:0] state;    
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            counter <= 0;
+            state   <= 0; 
+        end else begin
+            counter <= counter + 1;
+
+            case (state)
+                2'd0: begin 
+                    red    <= 1;
+                    yellow <= 0;
+                    green  <= 0;
+                    if (counter == RED_TIME) begin
+                        state   <= 1; 
+                        counter <= 0;
+                    end
+                end
+
+                2'd1: begin 
+                    red    <= 0;
+                    yellow <= 1;
+                    green  <= 0;
+                    if (counter == YELLOW_TIME) begin
+                        state   <= 2; 
+                        counter <= 0;
+                    end
+                end 
+
+                2'd2: begin 
+                    red    <= 0;
+                    yellow <= 0;
+                    green  <= 1;
+                    if (counter == GREEN_TIME) begin
+                        state   <= 0; 
+                        counter <= 0;
+                    end
+                end
+
+                default: begin
+                    red    <= 1;
+                    yellow <= 0;
+                    green  <= 0;
+                    state  <= 0;
+                    counter <= 0;
+                end
+            endcase
+        end
+    end
+endmodule
+`timescale 1ns/1ps
+module tb_traffic_light;
+    reg clk;
+    reg reset;
+    wire red, yellow, green;
+
+    traffic_light uut (
+        .clk(clk),
+        .reset(reset),
+        .red(red),
+        .yellow(yellow),
+        .green(green)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        clk = 0;
+        reset = 1;
+
+        
+        #20;
+        reset = 0;
+
+        #200;
+        $finish;
+    end
+
+    initial begin
+        $monitor("time=%0t | red=%b yellow=%b green=%b state=%d counter=%d",
+                 $time, red, yellow, green, uut.state, uut.counter);
+    end
+endmodule
+
