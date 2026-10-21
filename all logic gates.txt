@@ -1,0 +1,41 @@
+module all_gates(
+input a,b,
+output and_gate,
+or_gate,
+xor_gate,
+xnor_gate,
+nand_gate,
+nor_gate
+);
+assign and_gate = a&b;
+assign or_gate = a|b;
+assign xor_gate = a^b;
+assign xnor_gate = ~(a&b);
+assign nand_gate = ~(a|b);
+assign nor_gate = ~(a^b);
+endmodule
+//test benchcode:
+module all_gatetb;
+reg a,b;
+wire and_gate,or_gate,xor_gate;
+wire xnor_gate,nand_gate,nor_gate;
+ all_gates uut (
+         .a(a),
+         .b(b),
+         .and_gate(and_gate),
+         .or_gate(or_gate),
+         .xor_gate(xor_gate),
+         .xnor_gate(xnor_gate),
+         .nand_gate(nand_gate),
+         .nor_gate(nor_gate)
+);
+initial begin 
+$monitor ("t=%0t|a=%b,b=%b|and=%b,or=%b,xor=%b,xnor=%b,nand=%b,nor=%b",
+          $time,a,b,and_gate,or_gate,xor_gate,xnor_gate,nand_gate,nor_gate);
+a=0; b=0; #10;
+a=0; b=1; #10;
+a=1; b=0; #10;
+a=1; b=1; #10;
+$finish;
+end 
+endmodule
