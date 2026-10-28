@@ -1,0 +1,45 @@
+D FLIPFLOP VERILOG
+
+module d_ff(
+  input d,
+  input clk,
+  output reg q
+);
+  always @(posedge clk)
+    begin 
+    q <= d;
+    end
+endmodule
+TEST BENCH
+`timescale 1ns/1ps
+
+module d_fftb;
+
+reg d;
+reg clk;
+wire q;
+
+d_ff dut(
+    .d(d),
+    .clk(clk),
+    .q(q)
+);
+
+always #10 clk = ~clk;
+
+initial begin
+    clk = 0;
+
+    $display("Time\tclk\td\tq");
+    $monitor("%0t\t%b\t%b\t%b",
+             $time, clk, d, q);
+
+    d = 1; #20;
+    d = 0; #20;
+    d = 1; #20;
+    d = 0; #20;
+
+    $finish;
+end
+
+endmodule

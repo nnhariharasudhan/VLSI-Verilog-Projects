@@ -1,0 +1,52 @@
+SR FLP FLOP :
+VERILOG:
+module sr_ff(
+input s,r,
+input clk,
+output reg q
+);
+   always @(posedge clk)
+   begin 
+   case ({s,r})
+   2'b00: q <=q;
+   2'b01: q <=1'b0;
+   2'b10: q <=1'b1;
+   2'b11: q <=1'bx;
+ endcase 
+end 
+endmodule
+TEST BENCH :
+`timescale 1ns/1ps
+
+module sr_fftb;
+
+  reg s, r, clk;
+  wire q;
+
+  sr_ff DUT (
+      .s(s),
+      .r(r),
+      .clk(clk),
+      .q(q)
+  );
+
+  always #10 clk = ~clk;
+
+  initial begin
+    clk = 0;
+
+    $display("Time\tclk\ts\tr\tq");
+    $monitor("%0t\t%b\t%b\t%b\t%b",
+             $time, clk, s, r, q);
+
+
+    s = 1; r = 0; #20; // Set
+    s = 0; r = 0; #20; // Hold
+    s = 1; r = 0; #20; // Set
+    s = 0; r = 1; #20; // Reset
+    s = 1; r = 1; #20; // Invalid
+
+    $finish;
+  end
+
+endmodule
